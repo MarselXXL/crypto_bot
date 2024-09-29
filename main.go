@@ -59,6 +59,6 @@ func main() {
 	}()
 
 	for update := range updates {
-		handlers.HandleMessage(bot, update) // Обрабатываем сообщение
+		handlers.HandleMessage(bot, update, dbConn) // Обрабатываем сообщение
 	}
 }
