@@ -25,9 +25,16 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 		case text == "/history" || userStates[chatID][0] == "history":
 			HandleHistory(bot, chatID, dbConn, text)
 
+			// Обработка команды /wallet
+		case text == "/wallet":
+			HandleWallet(bot, chatID, dbConn, update)
+
 			// Ответ на другие команды
 		default:
-			msg := tgbotapi.NewMessage(chatID, "Привет! Напиши /price, чтобы узнать текущий курс биткоина, или /history, чтобы запросить исторические данные.")
+			msg := tgbotapi.NewMessage(
+				chatID,
+				"Привет! Напиши:\n/price, чтобы узнать текущий курс биткоина\n/history, чтобы запросить исторические данные\n/wallet, чтобы открыть кошелек",
+			)
 			bot.Send(msg)
 		}
 	}
