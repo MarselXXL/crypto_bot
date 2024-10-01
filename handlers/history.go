@@ -13,7 +13,7 @@ import (
 func HandleHistory(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, text string) {
 	switch userStates[chatID][1] {
 	case "":
-		msg := tgbotapi.NewMessage(chatID, "За сколько дней вы хотите получить данные?")
+		msg := tgbotapi.NewMessage(chatID, "За сколько минут вы хотите получить данные?")
 		bot.Send(msg)
 		//log.Printf("In Chat [%v] sent: %s", chatID, msg.Text)
 
@@ -23,7 +23,7 @@ func HandleHistory(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, text st
 		// Попробуем преобразовать текст в число
 		days, err := strconv.Atoi(text)
 		if err != nil || days <= 0 {
-			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректное количество дней.")
+			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректное количество минут.")
 			bot.Send(msg)
 			return
 		}
@@ -41,7 +41,7 @@ func HandleHistory(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, text st
 			msg := tgbotapi.NewMessage(chatID, "Нет данных за указанный период.")
 			bot.Send(msg)
 		} else {
-			response := fmt.Sprintf("Исторические данные по курсу биткоина за последние %d дней:\n", days)
+			response := fmt.Sprintf("Исторические данные по курсу биткоина за последние %d мин.:\n", days)
 			for _, price := range prices {
 				response += fmt.Sprintf("%s: $%.2f\n", price.CreatedAt.Format("2006-01-02 15:04:05"), price.Price)
 			}
