@@ -29,6 +29,10 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 		case text == "/wallet":
 			HandleWallet(bot, chatID, dbConn, update)
 
+			// Обработка команды /Add_test_balance
+		case text == "/add_test_balance" || userStates[chatID][0] == "add_test_balance":
+			HandleAdd_test_balance(bot, chatID, dbConn, update)
+
 			// Ответ на другие команды
 		default:
 			msg := tgbotapi.NewMessage(

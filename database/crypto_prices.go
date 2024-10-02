@@ -13,8 +13,8 @@ func SaveCryptoPrice(conn *pgx.Conn, currency string, price float64) error {
 }
 
 // GetCryptoPrices получает курсы криптовалюты за последние n минут
-func GetCryptoPrices(conn *pgx.Conn, currency string, days int) ([]CryptoPrice, error) {
-	rows, err := conn.Query(context.Background(), "SELECT id, currency, price, created_at FROM crypto_prices WHERE currency = $1 AND created_at >= NOW() - INTERVAL '1 minute' * $2", currency, days)
+func GetCryptoPrices(conn *pgx.Conn, currency string, minutes int) ([]CryptoPrice, error) {
+	rows, err := conn.Query(context.Background(), "SELECT id, currency, price, created_at FROM crypto_prices WHERE currency = $1 AND created_at >= NOW() - INTERVAL '1 minute' * $2", currency, minutes)
 	if err != nil {
 		return nil, err
 	}
