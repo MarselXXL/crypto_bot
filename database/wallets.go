@@ -8,11 +8,13 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// Создает запись о новом юзере с балансом 0
 func CreateUser(conn *pgx.Conn, update tgbotapi.Update) error {
 	_, err := conn.Exec(context.Background(), "INSERT INTO wallets (tg_name) VALUES ($1)", update.Message.From.UserName)
 	return err
 }
 
+// Обновляет баланс на заданную сумму
 func UpdateBalance(conn *pgx.Conn, update tgbotapi.Update, sign bool, amount float64) error {
 	var query string
 	// Открываем транзакцию
@@ -44,4 +46,26 @@ func UpdateBalance(conn *pgx.Conn, update tgbotapi.Update, sign bool, amount flo
 	}
 	return nil
 
+}
+
+// Запрашивает баланс юзера
+func Balance(conn *pgx.Conn, update tgbotapi.Update) (map[string]float64, error) {
+	rows, err := conn.Query(context.Background(), "SELECT balance_usd,balance_btc FROM wallets WHERE tg_name = $1", update.Message.From.UserName)
+	if err != nil {
+		return nil, fmt.Errorf("1 %v", err)
+	}
+	defer rows.Close()
+	balance := make(map[string]float64)
+
+	rows.Next()
+
+	var a, b float64
+	err = rows.Scan(&a, &b)
+	balance["USD"] = a
+	balance["BTC"] = b
+	if err != nil {
+		return nil, fmt.Errorf("2 %v", err)
+	}
+
+	return balance, nil
 }
