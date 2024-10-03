@@ -38,6 +38,9 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 			// Обработка команды /buy
 		case text == "/buy" || userStates[chatID][0] == "buy":
 			HandleBuy(bot, chatID, dbConn, update)
+			// Обработка команды /sell
+		case text == "/sell" || userStates[chatID][0] == "sell":
+			HandleSell(bot, chatID, dbConn, update)
 
 			// Ответ на другие команды
 		default:
