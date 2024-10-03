@@ -15,6 +15,6 @@ func HandleBalance(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update 
 		bot.Send(msg)
 		return
 	}
-	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Баланс:\nUSD: %.2f\nBTC: %.6f", balance["USD"], balance["BTC"]))
+	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Баланс:\nUSD: %.2f\nBitcoin: %.6f", balance["usd"], balance["bitcoin"]))
 	bot.Send(msg)
 }

@@ -18,8 +18,8 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 		//Обработка команд
 		switch {
 		// Обработка команды /price
-		case text == "/price":
-			HandlePrice(bot, chatID)
+		case text == "/price" || userStates[chatID][0] == "price":
+			HandlePrice(bot, chatID, update)
 
 			// Обработка команды /history
 		case text == "/history" || userStates[chatID][0] == "history":

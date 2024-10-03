@@ -1,18 +1,19 @@
-package crypto
+package cryptoapi
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-resty/resty/v2"
 )
 
 // GetBitcoinPrice получает курс биткоина
-func GetBitcoinPrice() (float64, error) {
+func GetCryptoPrice(currency string) (float64, error) {
 	client := resty.New()
 
 	resp, err := client.R().
 		SetHeader("Accept", "application/json").
-		Get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+		Get(fmt.Sprintf("https://api.coingecko.com/api/v3/simple/price?ids=%v&vs_currencies=usd", currency))
 
 	if err != nil {
 		return 0, err
@@ -24,5 +25,5 @@ func GetBitcoinPrice() (float64, error) {
 		return 0, err
 	}
 
-	return result["bitcoin"]["usd"], nil
+	return result[currency]["usd"], nil
 }

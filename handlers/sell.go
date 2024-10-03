@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"crypto_bot/crypto"
+	"crypto_bot/cryptoapi"
 	"crypto_bot/database"
 	"fmt"
 	"strconv"
@@ -10,10 +10,17 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+var userSellCurrency = make(map[int64]string)
+
 func HandleSell(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbotapi.Update) {
 	switch userStates[chatID][1] {
 	case "":
-		msg := tgbotapi.NewMessage(chatID, "Какую сумму BTC вы хотите продать?")
+		msg := tgbotapi.NewMessage(chatID, "Выберите, какую валюту продать:\n/bitcoin")
+		bot.Send(msg)
+		userStates[chatID] = [2]string{"sell", "recieved_currency"}
+	case "recieved_currency":
+		userSellCurrency[chatID] = update.Message.Text[1:]
+		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Какую сумму в %v вы хотите продать?", userSellCurrency[chatID]))
 		bot.Send(msg)
 
 		// Сохраняем состояние пользователя
@@ -22,30 +29,31 @@ func HandleSell(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgb
 		// Попробуем преобразовать текст в число
 		amountSell, err := strconv.ParseFloat(update.Message.Text, 64)
 		if err != nil || amountSell <= 0 {
-			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму в BTC.")
+			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму.")
 			bot.Send(msg)
 			return
 		}
 		//Запрашиваем актуальный курс биткоина
-		priceBTC, err := crypto.GetBitcoinPrice()
+		price, err := cryptoapi.GetCryptoPrice(userSellCurrency[chatID])
 		if err != nil {
-			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при получении цены биткоина: %v", err))
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при получении цены %v: %v", userSellCurrency[chatID], err))
 			bot.Send(msg)
 			return
 		}
-		//Считаем сколько USD нужно зачислить
-		amountBuy := amountSell * priceBTC
+		//Считаем сколько биткоинов нужно зачислить
+		amountBuy := amountSell * price
 		//Обновляем баланс
-		err = database.UpdateBalanceBuy(dbConn, update, "balance_btc", "balance_usd", amountSell, amountBuy)
+		err = database.UpdateBalanceBuy(dbConn, update, userSellCurrency[chatID], "usd", amountSell, amountBuy)
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при обновлении баланса: %v", err))
 			bot.Send(msg)
 			return
 		}
-		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Зачислено %.6f USD по курсу %.2f за BTC", amountBuy, priceBTC))
+		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Продано %.6f %v по курсу %v", amountSell, userSellCurrency[chatID], price))
 		bot.Send(msg)
 		//Чистим состояние пользователя
 		delete(userStates, chatID)
+		delete(userBuyCurrency, chatID)
 	}
 
 }

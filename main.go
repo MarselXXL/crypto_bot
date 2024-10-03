@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"crypto_bot/crypto"
+	"crypto_bot/cryptoapi"
 	"crypto_bot/database"
 	"crypto_bot/handlers"
 	"log"
@@ -41,7 +41,7 @@ func main() {
 	// Запускаем горутину для периодического сохранения курса биткоина
 	go func() {
 		for {
-			price, err := crypto.GetBitcoinPrice()
+			price, err := cryptoapi.GetCryptoPrice("bitcoin")
 			if err != nil {
 				log.Println("Error fetching Bitcoin price:", err)
 				time.Sleep(1 * time.Minute) // Ждем минуту перед следующей попыткой
