@@ -35,6 +35,9 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 			// Обработка команды /balance
 		case text == "/balance":
 			HandleBalance(bot, chatID, dbConn, update)
+			// Обработка команды /buy
+		case text == "/buy" || userStates[chatID][0] == "buy":
+			HandleBuy(bot, chatID, dbConn, update)
 
 			// Ответ на другие команды
 		default:

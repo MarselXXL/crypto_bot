@@ -26,7 +26,7 @@ func HandleAdd_test_balance(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn
 			return
 		}
 		//Обновляем баланс
-		err = database.UpdateBalance(dbConn, update, true, float64(amount))
+		err = database.UpdateBalance(dbConn, update, "balance_usd", true, float64(amount))
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при обновлении баланса: %v", err))
 			bot.Send(msg)
