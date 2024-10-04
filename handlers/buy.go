@@ -26,15 +26,10 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		// Сохраняем состояние пользователя
 		userStates[chatID] = [2]string{"buy", "awaiting_amount"}
 	case "awaiting_amount":
-		if update.Message.Text == "/exit" {
-			delete(userStates, chatID)
-			delete(userBuyCurrency, chatID)
-			return
-		}
 		// Попробуем преобразовать текст в число
 		amountSell, err := strconv.ParseFloat(update.Message.Text, 64)
 		if err != nil || amountSell <= 0 {
-			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму в USD или /exit чтобы выйти")
+			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму в USD.")
 			bot.Send(msg)
 			return
 		}
@@ -50,7 +45,7 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		//Обновляем баланс
 		err = database.UpdateBalanceBuy(dbConn, update, "usd", userBuyCurrency[chatID], amountSell, amountBuy)
 		if err != nil {
-			msg := tgbotapi.NewMessage(chatID, "Ошибка при обновлении баланса. Введите корректный баланс или напишите /exit")
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при обновлении баланса: %v", err))
 			bot.Send(msg)
 			return
 		}
