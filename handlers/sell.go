@@ -26,10 +26,15 @@ func HandleSell(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgb
 		// Сохраняем состояние пользователя
 		userStates[chatID] = [2]string{"sell", "awaiting_amount"}
 	case "awaiting_amount":
+		if update.Message.Text == "/exit" {
+			delete(userStates, chatID)
+			delete(userBuyCurrency, chatID)
+			return
+		}
 		// Попробуем преобразовать текст в число
 		amountSell, err := strconv.ParseFloat(update.Message.Text, 64)
 		if err != nil || amountSell <= 0 {
-			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму.")
+			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму. Или введите /exit чтобы выйти")
 			bot.Send(msg)
 			return
 		}
@@ -38,6 +43,8 @@ func HandleSell(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgb
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при получении цены %v: %v", userSellCurrency[chatID], err))
 			bot.Send(msg)
+			delete(userStates, chatID)
+			delete(userBuyCurrency, chatID)
 			return
 		}
 		//Считаем сколько биткоинов нужно зачислить
@@ -47,6 +54,8 @@ func HandleSell(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgb
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при обновлении баланса: %v", err))
 			bot.Send(msg)
+			delete(userStates, chatID)
+			delete(userBuyCurrency, chatID)
 			return
 		}
 		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Продано %.6f %v по курсу %v", amountSell, userSellCurrency[chatID], price))
