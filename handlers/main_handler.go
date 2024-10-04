@@ -41,6 +41,9 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 			// Обработка команды /sell
 		case text == "/sell" || userStates[chatID][0] == "sell":
 			HandleSell(bot, chatID, dbConn, update)
+			// Обработка команды /send
+		case text == "/send" || userStates[chatID][0] == "send":
+			HandleSend(bot, chatID, dbConn, update)
 
 			// Ответ на другие команды
 		default:
