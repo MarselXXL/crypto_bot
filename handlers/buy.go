@@ -54,11 +54,10 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		//Обновляем баланс
 		err = database.UpdateBalanceBuy(dbConn, update, "usd", userBuyCurrency[chatID], amountSell, amountBuy)
 		if err != nil {
-			msg := tgbotapi.NewMessage(chatID, "Ошибка при обновлении баланса")
+			msg := tgbotapi.NewMessage(chatID, "Ошибка. Проверьте, достаточно ли USD на балансе с помощью /balance")
 			bot.Send(msg)
 			delete(userStates, chatID)
 			delete(userBuyCurrency, chatID)
-			HandleHello(bot, chatID)
 			return
 		}
 		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Куплено %.6f %v по курсу %v", amountBuy, userBuyCurrency[chatID], price))
