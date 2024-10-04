@@ -21,12 +21,12 @@ func HandlePrice(bot *tgbotapi.BotAPI, chatID int64, update tgbotapi.Update) {
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, "Не удалось получить курс.")
 			bot.Send(msg)
-			//log.Printf("In Chat [%v] sent: %s", chatID, msg.Text)
+			delete(userStates, chatID)
 			return
 		}
 		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Курс %v: $%.2f", update.Message.Text[1:], price))
 		bot.Send(msg)
-		//log.Printf("In Chat [%v] sent: %s", chatID, msg.Text)
+
 		delete(userStates, chatID)
 	}
 }
