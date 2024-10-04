@@ -15,6 +15,6 @@ func HandleBalance(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update 
 		bot.Send(msg)
 		return
 	}
-	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Баланс:\nUSD: %.2f\nBitcoin: %.6f", balance["usd"], balance["bitcoin"]))
+	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Баланс:\nUSD: %.2f\nBitcoin: %.6f\nВы можете добавить USD на баланс с помощью /add_test_balance", balance["usd"], balance["bitcoin"]))
 	bot.Send(msg)
 }
