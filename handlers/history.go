@@ -27,10 +27,15 @@ func HandleHistory(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, text st
 		// Сохраняем состояние пользователя
 		userStates[chatID] = [2]string{"history", "awaiting_minutes"}
 	case "awaiting_minutes":
+		if text == "/exit" {
+			delete(userStates, chatID)
+			HandleHello(bot, chatID)
+			return
+		}
 		// Попробуем преобразовать текст в число
 		days, err := strconv.Atoi(text)
 		if err != nil || days <= 0 {
-			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректное количество минут.")
+			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректное количество минут или /exit чтобы выйти")
 			bot.Send(msg)
 			return
 		}
@@ -40,6 +45,8 @@ func HandleHistory(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, text st
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, "Не удалось получить исторические данные.")
 			bot.Send(msg)
+			delete(userStates, chatID)
+			delete(userHistoryCurrency, chatID)
 			return
 		}
 
