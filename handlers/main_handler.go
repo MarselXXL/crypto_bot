@@ -44,11 +44,7 @@ func HandleMessage(bot *tgbotapi.BotAPI, update tgbotapi.Update, dbConn *pgx.Con
 
 			// Ответ на другие команды
 		default:
-			msg := tgbotapi.NewMessage(
-				chatID,
-				"Привет! Напиши:\n/price, чтобы узнать текущий курс биткоина\n/history, чтобы запросить исторические данные\n/wallet, чтобы открыть кошелек",
-			)
-			bot.Send(msg)
+			HandleHello(bot, chatID)
 		}
 	}
 }
