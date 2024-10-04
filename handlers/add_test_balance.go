@@ -18,10 +18,14 @@ func HandleAdd_test_balance(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn
 		// Сохраняем состояние пользователя
 		userStates[chatID] = [2]string{"add_test_balance", "awaiting_amount"}
 	case "awaiting_amount":
+		if update.Message.Text == "/exit" {
+			delete(userStates, chatID)
+			return
+		}
 		// Попробуем преобразовать текст в число
 		amount, err := strconv.ParseFloat(update.Message.Text, 64)
-		if err != nil || amount <= 0 {
-			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму в USD.")
+		if err != nil || amount < 0 {
+			msg := tgbotapi.NewMessage(chatID, "Пожалуйста, введите корректную сумму в USD или /exit")
 			bot.Send(msg)
 			return
 		}
