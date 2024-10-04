@@ -29,6 +29,7 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		if update.Message.Text == "/exit" {
 			delete(userStates, chatID)
 			delete(userBuyCurrency, chatID)
+			HandleHello(bot, chatID)
 			return
 		}
 		// Попробуем преобразовать текст в число
@@ -43,6 +44,9 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при получении цены %v: %v", userBuyCurrency[chatID], err))
 			bot.Send(msg)
+			delete(userStates, chatID)
+			delete(userBuyCurrency, chatID)
+			HandleHello(bot, chatID)
 			return
 		}
 		//Считаем сколько биткоинов нужно зачислить
@@ -50,8 +54,11 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		//Обновляем баланс
 		err = database.UpdateBalanceBuy(dbConn, update, "usd", userBuyCurrency[chatID], amountSell, amountBuy)
 		if err != nil {
-			msg := tgbotapi.NewMessage(chatID, "Ошибка при обновлении баланса. Введите корректный баланс или напишите /exit")
+			msg := tgbotapi.NewMessage(chatID, "Ошибка при обновлении баланса")
 			bot.Send(msg)
+			delete(userStates, chatID)
+			delete(userBuyCurrency, chatID)
+			HandleHello(bot, chatID)
 			return
 		}
 		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Куплено %.6f %v по курсу %v", amountBuy, userBuyCurrency[chatID], price))
