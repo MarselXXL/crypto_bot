@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"crypto_bot/database"
+	"crypto_bot/database/wallets"
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -9,7 +9,7 @@ import (
 )
 
 func HandleBalance(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbotapi.Update) {
-	balance, err := database.Balance(dbConn, update)
+	balance, err := wallets.Balance(dbConn, update)
 	if err != nil {
 		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при получении баланса: %v", err))
 		bot.Send(msg)

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"crypto_bot/cryptoapi"
-	"crypto_bot/database"
+	"crypto_bot/database/wallets"
 	"fmt"
 	"strconv"
 
@@ -52,7 +52,7 @@ func HandleBuy(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgbo
 		//Считаем сколько биткоинов нужно зачислить
 		amountBuy := amountSell / price
 		//Обновляем баланс
-		err = database.UpdateBalanceBuy(dbConn, update, "usd", userBuyCurrency[chatID], amountSell, amountBuy)
+		err = wallets.UpdateBalanceBuy(dbConn, update, "usd", userBuyCurrency[chatID], amountSell, amountBuy)
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, "Ошибка. Проверьте, достаточно ли USD на балансе с помощью /balance")
 			bot.Send(msg)

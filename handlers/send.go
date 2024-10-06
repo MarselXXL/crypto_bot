@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"crypto_bot/database"
+	"crypto_bot/database/wallets"
 	"fmt"
 	"strconv"
 
@@ -50,7 +50,7 @@ func HandleSend(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgb
 		userStates[chatID] = [2]string{"send", "awaiting_reciever_name"}
 	case "awaiting_reciever_name":
 		recieverName := update.Message.Text[1:]
-		err := database.Send(dbConn, update, userSendCurrency[chatID], userSendAmount[chatID], recieverName)
+		err := wallets.Send(dbConn, update, userSendCurrency[chatID], userSendAmount[chatID], recieverName)
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при отправке:\n%v", err))
 			bot.Send(msg)
