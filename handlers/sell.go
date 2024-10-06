@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"crypto_bot/cryptoapi"
-	"crypto_bot/database"
+	"crypto_bot/database/wallets"
 	"fmt"
 	"strconv"
 
@@ -50,7 +50,7 @@ func HandleSell(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, update tgb
 		//Считаем сколько биткоинов нужно зачислить
 		amountBuy := amountSell * price
 		//Обновляем баланс
-		err = database.UpdateBalanceBuy(dbConn, update, userSellCurrency[chatID], "usd", amountSell, amountBuy)
+		err = wallets.UpdateBalanceBuy(dbConn, update, userSellCurrency[chatID], "usd", amountSell, amountBuy)
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при обновлении баланса: %v", err))
 			bot.Send(msg)

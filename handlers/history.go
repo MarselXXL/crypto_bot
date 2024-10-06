@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"crypto_bot/database"
+	"crypto_bot/database/crypto_prices"
 	"fmt"
 	"strconv"
 
@@ -41,7 +41,7 @@ func HandleHistory(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn, text st
 		}
 
 		// Запрашиваем данные из базы данных за указанный период
-		prices, err := database.GetCryptoPrices(dbConn, userHistoryCurrency[chatID], days)
+		prices, err := crypto_prices.GetCryptoPrices(dbConn, userHistoryCurrency[chatID], days)
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, "Не удалось получить исторические данные.")
 			bot.Send(msg)

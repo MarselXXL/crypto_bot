@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto_bot/cryptoapi"
 	"crypto_bot/database"
+	"crypto_bot/database/crypto_prices"
 	"crypto_bot/handlers"
 	"log"
 	"time"
@@ -49,7 +50,7 @@ func main() {
 			}
 
 			// Сохраняем курс в базу данных
-			err = database.SaveCryptoPrice(dbConn, "bitcoin", price)
+			err = crypto_prices.SaveCryptoPrice(dbConn, "bitcoin", price)
 			if err != nil {
 				log.Println("Error saving Bitcoin price:", err)
 			}

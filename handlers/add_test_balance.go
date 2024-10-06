@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"crypto_bot/database"
+	"crypto_bot/database/wallets"
 	"fmt"
 	"strconv"
 
@@ -30,7 +30,7 @@ func HandleAdd_test_balance(bot *tgbotapi.BotAPI, chatID int64, dbConn *pgx.Conn
 			return
 		}
 		//Обновляем баланс
-		err = database.UpdateBalance(dbConn, update, "usd", true, float64(amount))
+		err = wallets.UpdateBalance(dbConn, update, "usd", true, float64(amount))
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Ошибка при обновлении баланса: %v", err))
 			bot.Send(msg)
