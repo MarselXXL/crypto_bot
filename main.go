@@ -17,8 +17,9 @@ func main() {
 	if token == "" {
 		log.Fatal("TELEGRAM_BOT_TOKEN not provided")
 	}
+	time.Sleep(3 * time.Second)
 
-	connString := "postgres://postgres:111111@localhost:5432/crypto_db" // Замените на свои данные
+	connString := "postgres://postgres:111111@postgres:5432/crypto_db"
 	dbConn, err := database.Connect(connString)
 	if err != nil {
 		log.Fatal("Unable to connect to database:", err)

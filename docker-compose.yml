@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    ports:
+      - "8080:8080"  # Замените на нужный порт вашего бота
+    environment:
+      - TELEGRAM_BOT_TOKEN=12311237b
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 111111
+      POSTGRES_DB: crypto_db
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Добавьте эту строку
+    ports:
+      - "5432:5432"
